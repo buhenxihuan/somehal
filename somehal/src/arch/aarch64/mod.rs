@@ -57,7 +57,7 @@ const FLAG_ANY_MEM: usize = 0b1000;
 pub unsafe extern "C" fn _start() -> ! {
     naked_asm!(
         // code0/code1
-        "nop",
+        "add     x13, x18, #0x16",
         "bl {entry}",
         // text_offset
         ".quad 0",
@@ -92,6 +92,8 @@ fn primary_entry() -> ! {
         loader = sym crate::loader::LOADER_BIN,
     )
 }
+
+static CUSTOM_DTB: &[u8] = include_bytes!("/media/kylin/USR-DATA/xh/work/os_virt/code/axvisor/configs/vms/d3000.dtb");
 
 #[start_code(naked)]
 fn preserve_boot_args() {
@@ -138,7 +140,8 @@ fn preserve_boot_args() {
 
 	dmb	sy				// needed before dc ivac with
 						// MMU off
-    mov x0, x8                    
+    mov x0, x8
+    adr_l!(x1, "{custom_dtb}")                    
 	add	x1, x0, {boot_arg_size}		
 	b	{dcache_inval_poc}		// tail call
         ",
@@ -158,7 +161,8 @@ fn preserve_boot_args() {
     args_of_page_size = const offset_of!(EarlyBootArgs, page_size),
     args_of_debug = const offset_of!(EarlyBootArgs, debug),
     dcache_inval_poc = sym cache::__dcache_inval_poc,
-    boot_arg_size = const size_of::<EarlyBootArgs>()
+    boot_arg_size = const size_of::<EarlyBootArgs>(),
+    custom_dtb = sym CUSTOM_DTB,
     )
 }
 

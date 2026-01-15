@@ -85,7 +85,6 @@ fn switch_to_target_el(bootargs: &EarlyBootArgs) {
         _ => panic!("Unsupported exception level: {}", target_el),
     }
 }
-static CUSTOM_DTB: &[u8] = include_bytes!("/media/kylin/USR-DATA/xh/work/os_virt/code/axvisor/configs/vms/d3000.dtb");
 fn entry(bootargs: &EarlyBootArgs) -> *mut () {
     enable_fp();
     unsafe {
@@ -95,8 +94,8 @@ fn entry(bootargs: &EarlyBootArgs) -> *mut () {
 
         cache::dcache_all(cache::DcacheOp::CleanAndInvalidate);
 
-        // let mut fdt = bootargs.args[0];
-        let mut fdt = CUSTOM_DTB.as_ptr() as usize;
+        let mut fdt = bootargs.args[0];
+        // let mut fdt = CUSTOM_DTB.as_ptr() as usize;
         OFFSET = bootargs.kimage_addr_vma as usize - bootargs.kimage_addr_lma as usize;
         set_page_size(bootargs.page_size);
         ram::init(bootargs.kcode_end as _);
