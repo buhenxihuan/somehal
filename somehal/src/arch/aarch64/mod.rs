@@ -140,8 +140,10 @@ fn preserve_boot_args() {
 
 	dmb	sy				// needed before dc ivac with
 						// MMU off
-    mov x0, x8
-    adr_l!(x1, "{custom_dtb}")                    
+    mov x0, x8",
+    
+    adr_l!(x1, "{custom_dtb}"),
+    "                    
 	add	x1, x0, {boot_arg_size}		
 	b	{dcache_inval_poc}		// tail call
         ",
